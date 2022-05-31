@@ -1,6 +1,14 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-}
+const WindiCSSWebpackPlugin = require("windicss-webpack-plugin");
+const withTM = require("next-transpile-modules")(["monaco-editor"]);
 
-module.exports = nextConfig
+/** @type {import('next').NextConfig} */
+const nextConfig = withTM({
+  webpack: (config) => {
+    config.plugins.push(new WindiCSSWebpackPlugin());
+    return config;
+  },
+  compress: true,
+  reactStrictMode: false,
+});
+
+module.exports = nextConfig;
