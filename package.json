@@ -23,7 +23,7 @@
     "react-hot-toast": "2.2.0",
     "react-markdown": "8.0.3",
     "react-split-pane": "0.1.92",
-    "remark-gfm": "2.0.0"
+    "remark-gfm": "3.0.1"
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.6",
