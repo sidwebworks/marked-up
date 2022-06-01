@@ -995,3 +995,11 @@
 .markdown-body ::-webkit-calendar-picker-indicator {
     filter: invert(50%);
 }
+/* Hide the focus ring styles from Windicss in Monaco */
+.monaco-editor textarea:focus {
+    box-shadow: none !important;
+}
+
+.monaco-editor .drop-target {
+    @apply text-center text-sm pointer-events-none w-[300px] text-green-400 border-2 border-dashed border-green-400
+}

@@ -1,34 +1,16 @@
-import { atom, useAtom, WritableAtom } from "jotai";
-import type { editor } from "monaco-editor";
+import { atom } from "jotai";
 
-export type Template = {
-  name: string;
-  code: string;
-};
+function createToggleAtom(defaultValue: boolean = false) {
+  const self = atom(defaultValue, (get, set, next) => {
+    const update = next ?? !get(self);
+    set(self, update);
+  });
 
-export const templatesAtom = atom<Template[]>([
-  {
-    name: "Project Title",
-    code: `
-    # Project Title
-    A brief description of what this project does and who it's for
-`,
-  },
-  {
-    name: "Contributors",
-    code: `
-    # Project Title
-    A brief description of what this project does and who it's for
-`,
-  },
-]);
+  return self;
+}
 
-export const isSettingsOpen = atom(false, (get, set, next) => {
-  const update = next ?? !get(isSettingsOpen);
-  set(isSettingsOpen, update);
-});
+export const isSettingsOpen = createToggleAtom(false);
 
-export const isPreviewOpen = atom(false, (get, set, next) => {
-  const update = next ?? !get(isPreviewOpen);
-  set(isPreviewOpen, update);
-});
+export const isPreviewOpen = createToggleAtom(true);
+
+export const isCommandPalleteOpen = createToggleAtom(false);

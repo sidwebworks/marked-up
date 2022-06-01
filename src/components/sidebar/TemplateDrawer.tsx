@@ -1,16 +1,6 @@
-import { Transition, Dialog } from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
-import { useAtom } from "jotai";
-import {
-  Dispatch,
-  SetStateAction,
-  Fragment,
-  FC,
-  forwardRef,
-  ComponentPropsWithRef,
-} from "react";
-import { arrayMove, List } from "react-movable";
-import { Template, templatesAtom } from "../../lib/store/ui-atoms";
+import { Dispatch, Fragment, SetStateAction, useState } from "react";
 
 interface TemplateDrawerProps {
   isOpen: boolean;
@@ -21,7 +11,7 @@ const TemplateDrawer: React.FC<TemplateDrawerProps> = ({
   isOpen,
   setIsOpen,
 }) => {
-  const [templates, setTemplates] = useAtom(templatesAtom);
+  const [templates, setTemplates] = useState([]);
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -77,28 +67,6 @@ const TemplateDrawer: React.FC<TemplateDrawerProps> = ({
                         Select a section template
                       </Dialog.Title>
                     </div>
-                    <div className="relative m-4 p-2 border-2 border-dashed border-dark-200 flex-1 ">
-                      <List
-                        values={templates}
-                        onChange={({ oldIndex, newIndex }) =>
-                          setTemplates(arrayMove(templates, oldIndex, newIndex))
-                        }
-                        renderList={({ children, props }) => (
-                          <ul {...props} className="space-y-2">
-                            {children}
-                          </ul>
-                        )}
-                        renderItem={({ value, props }) => (
-                          <TemplateItem
-                            code={value.code}
-                            name={value.name}
-                            {...props}
-                          />
-                        )}
-                      />
-
-                      {/* /End replace */}
-                    </div>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
@@ -109,21 +77,5 @@ const TemplateDrawer: React.FC<TemplateDrawerProps> = ({
     </Transition.Root>
   );
 };
-
-const TemplateItem: FC<ComponentPropsWithRef<"li"> & Template> = forwardRef(
-  ({ code, name, ...props }, ref) => {
-    return (
-      <li
-        ref={ref}
-        {...props}
-        className="p-3  relative z-10 list-none rounded-md text-cyan-400 rounded-md bg-dark-400"
-      >
-        {name}
-      </li>
-    );
-  }
-);
-
-TemplateItem.displayName = "TemplateItem";
 
 export default TemplateDrawer;

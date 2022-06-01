@@ -1,20 +1,19 @@
-import { Dialog, Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, SelectorIcon } from "@heroicons/react/outline";
+import { Dialog, Tab, Transition } from "@headlessui/react";
+import { CogIcon } from "@heroicons/react/outline";
 import { settings, themeAtom } from "@lib/store/settings-atom";
 import { isSettingsOpen } from "@lib/store/ui-atoms";
-import { clsx } from "@lib/utilities";
+import { clsx, normalizeThemeName } from "@lib/utilities";
 import { useMonaco } from "@monaco-editor/react";
 import { useAtom, useAtomValue } from "jotai";
-import React, { Fragment, Suspense, useEffect, useState } from "react";
-import { loadTheme, normalizeThemeName } from "../editor/monaco.helpers";
+import React, { Fragment, Suspense, useMemo } from "react";
+import { loadTheme } from "../editor/monaco.helpers";
+import Select from "../shared/Select";
 import Toggle from "../shared/Toggle";
 
 interface SettingsModalProps {}
 
 const SettingsModal: React.FC<SettingsModalProps> = () => {
   const [isOpen, setIsOpen] = useAtom(isSettingsOpen);
-
-  const [{ scrollSync }, setSettings] = useAtom(settings);
 
   function closeModal() {
     setIsOpen(false);
@@ -50,39 +49,12 @@ const SettingsModal: React.FC<SettingsModalProps> = () => {
                 <Dialog.Panel className="w-full max-w-lg transform  rounded-2xl bg-dark-700 p-5 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium  my-0 text-gray-200"
+                    className="text-lg font-medium my-0 text-gray-200"
                   >
-                    Settings
+                    App Settings
                   </Dialog.Title>
-                  <p className="text-sm mt-1 text-true-gray-500">
-                    This app is still in Beta, I am a single developer working
-                    on this.
-                  </p>
 
-                  <div className="mt-4 grid grid-cols-2 ">
-                    <SettingsToggle
-                      value={scrollSync}
-                      label="Enable scroll sync"
-                      onChange={() =>
-                        setSettings((p) => ({
-                          ...p,
-                          scrollSync: !p.scrollSync,
-                        }))
-                      }
-                    />
-                    <div className="py-1 border-y-1  col-span-2 flex items-center gap-2 border-dark-600">
-                      <label className="text-true-gray-400  text-sm">
-                        {"Editor Theme"}
-                      </label>
-                      <Suspense
-                        fallback={
-                          <div className="w-full h-10 rounded-md col-span-2 max-w-1/2 animate-duration-[5s] bg-dark-300 animate-loop animate-flash " />
-                        }
-                      >
-                        <ThemePicker />
-                      </Suspense>
-                    </div>
-                  </div>
+                  <SettingsTabs />
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -112,19 +84,17 @@ const SettingsToggle: React.FC<SettingsOptionProps> = ({
   );
 };
 
-type ThemePickerProps = {};
-
-const ThemePicker: React.FC<ThemePickerProps> = () => {
+const ThemePicker: React.FC = () => {
   const themes = useAtomValue(themeAtom);
   const [{ currentTheme }, setSelected] = useAtom(settings);
   const monacoInstance = useMonaco();
 
-  const handleChange = async (val: string) => {
+  const handleChange = async (val: { label: string; value: string }) => {
     if (!monacoInstance?.editor) return;
 
     const theme = await loadTheme(val);
 
-    const name = normalizeThemeName(val);
+    const name = normalizeThemeName(val.value);
 
     monacoInstance.editor.defineTheme(name, theme);
     monacoInstance.editor.setTheme(name);
@@ -132,60 +102,74 @@ const ThemePicker: React.FC<ThemePickerProps> = () => {
     setSelected((p) => ({ ...p, currentTheme: val }));
   };
 
+  return <Select data={themes} onChange={handleChange} active={currentTheme} />;
+};
+
+interface SettingsTabsProps {}
+
+const SettingsTabs: React.FC<SettingsTabsProps> = () => {
+  const headers = useMemo(() => ["Editor", "Document", "Support"], []);
+
+  const [{ scrollSync }, setSettings] = useAtom(settings);
+
   return (
-    <Listbox value={currentTheme} onChange={handleChange}>
-      <div className="relative mt-1 w-full max-w-56">
-        <Listbox.Button className="relative w-full cursor-default rounded-lg bg-dark-300 py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focusable  sm:text-sm">
-          <span className="block truncate text-cyan-500">{currentTheme}</span>
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <SelectorIcon
-              className="h-5 w-5 text-true-gray-500"
-              aria-hidden="true"
+    <Tab.Group defaultIndex={0}>
+      <Tab.List className={"mt-3 w-full flex"}>
+        {headers.map((el) => (
+          <Tab
+            className={({ selected }) =>
+              clsx(
+                "px-3 py-1 w-full text-sm border-b font-medium",
+                selected
+                  ? "border-b-cyan-500 text-cyan-500"
+                  : "border-dark-400 text-true-gray-500"
+              )
+            }
+            key={el}
+          >
+            {el}
+          </Tab>
+        ))}
+      </Tab.List>
+      <Tab.Panels className={"text-true-gray-400 pt-3"}>
+        <Tab.Panel className={"grid grid-cols-2"}>
+          <Suspense
+            fallback={
+              <div className="w-full h-30 col-span-2 rounded-lg bg-dark-300 animate-skeleton" />
+            }
+          >
+            <SettingsToggle
+              value={scrollSync}
+              label="Enable scroll sync"
+              onChange={() =>
+                setSettings((p) => ({
+                  ...p,
+                  scrollSync: !p.scrollSync,
+                }))
+              }
             />
-          </span>
-        </Listbox.Button>
-        <Transition
-          as={Fragment}
-          leave="transition ease-in duration-100"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-dark-400 py-1 text-base shadow-lg ring-1 focusable sm:text-sm">
-            {Object.entries(themes).map(([theme, value]) => (
-              <Listbox.Option
-                key={theme}
-                className={({ active }) =>
-                  clsx(
-                    "relative cursor-pointer select-none py-2 pl-10 pr-4 ",
-                    active
-                      ? "bg-dark-300 transition text-cyan-500"
-                      : "text-true-gray-200"
-                  )
-                }
-                value={value}
-              >
-                {({ selected }) => (
-                  <>
-                    <span
-                      className={`block truncate ${
-                        selected ? "font-medium text-cyan-500" : "font-normal"
-                      }`}
-                    >
-                      {value as string}
-                    </span>
-                    {selected ? (
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-cyan-400">
-                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                    ) : null}
-                  </>
-                )}
-              </Listbox.Option>
-            ))}
-          </Listbox.Options>
-        </Transition>
-      </div>
-    </Listbox>
+            <div className="py-1 border-y-1  col-span-2 flex items-center gap-2 border-dark-600">
+              <label className="text-true-gray-400  text-sm">
+                {"Editor Theme"}
+              </label>
+              <ThemePicker />
+            </div>
+          </Suspense>
+        </Tab.Panel>
+
+        <Tab.Panel className={"grid grid-cols-2"}>
+          <p className="text-sm text-true-gray-500 col-span-2">
+            Options for document settings
+          </p>
+        </Tab.Panel>
+        <Tab.Panel className={"grid grid-cols-2"}>
+          <p className="text-sm text-true-gray-500 col-span-2">
+            This app is still in Beta, I am a single developer working on this.
+            <br /> Please be patient 🙂
+          </p>
+        </Tab.Panel>
+      </Tab.Panels>
+    </Tab.Group>
   );
 };
 

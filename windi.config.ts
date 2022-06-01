@@ -5,12 +5,30 @@ export default defineConfig({
     include: ["**/*.{jsx,tsx,css}"],
     exclude: ["node_modules", ".git", ".next/**/*"],
   },
+  theme: {
+    extend: {
+      animation: {
+        skeleton: "skeleton 3s ease infinite",
+      },
+      keyframes: {
+        skeleton: {
+          "from, 50%, to": {
+            opacity: "1",
+          },
+          "25%, 75%": {
+            opacity: "0.3",
+          },
+        },
+      },
+    },
+  },
   shortcuts: {
     focusable:
       "focus-visible:ring-2 focus:outline-none focus-visible:ring-cyan-400 ",
     center: "flex items-center justify-center",
   },
   plugins: [
+    require("windicss/plugin/forms"),
     require("windicss/plugin/typography")(),
     require("@windicss/plugin-animations")({
       settings: {

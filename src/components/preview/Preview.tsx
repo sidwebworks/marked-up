@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { clsx, sanitizeHash } from "../../lib/utilities";
 import { codeAtom } from "@lib/store/editor-atoms";
 import { isPreviewOpen } from "@lib/store/ui-atoms";
+import StructureEditor from "./StructureEditor";
 
 const ReactMarkdown = dynamic<any>(() => import("react-markdown"));
 
@@ -41,12 +42,12 @@ const Preview: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <div className="grid sticky top-0 grid-cols-2 border-b-2 border-b-dark-400 text-dark-100 bg-dark-800 justify-between items-center">
+    <Fragment>
+      <div className="flex flex-1 sticky z-20 top-0 p-2 gap-1 border-b-2 border-b-dark-500 bg-dark-800 text-dark-100  justify-between items-center">
         <button
           className={clsx(
-            "focusable",
-            isPreview ? "bg-dark-500 text-cyan-500 py-2" : ""
+            "focusable flex-grow rounded-md py-2",
+            isPreview ? "bg-dark-400  text-cyan-500 " : "bg-dark-700"
           )}
           onClick={() => setIsPreview(true)}
         >
@@ -55,27 +56,29 @@ const Preview: React.FC = () => {
         <button
           onClick={() => setIsPreview(false)}
           className={clsx(
-            "focusable",
-            !isPreview ? "bg-dark-500 text-cyan-500 py-2" : ""
+            "focusable flex-grow rounded-md py-2",
+            !isPreview ? "bg-dark-400 text-cyan-500 py-2" : "bg-dark-700"
           )}
         >
           Structure
         </button>
       </div>
-      {isPreview ? (
-        <article onClickCapture={handleCapture}>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            skipHtml
-            className="h-full markdown-body w-auto overflow-auto p-3"
-          >
-            {code}
-          </ReactMarkdown>
-        </article>
-      ) : (
-        <Fragment />
-      )}
-    </div>
+      <main className="relative min-h-[85%] p-0.5 mt-4">
+        {isPreview ? (
+          <article onClickCapture={handleCapture}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              skipHtml
+              className="h-full markdown-body w-auto overflow-auto p-3"
+            >
+              {code}
+            </ReactMarkdown>
+          </article>
+        ) : (
+          <StructureEditor />
+        )}
+      </main>
+    </Fragment>
   );
 };
 

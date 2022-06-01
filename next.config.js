@@ -1,3 +1,4 @@
+const path = require("path");
 const WindiCSSWebpackPlugin = require("windicss-webpack-plugin");
 const withTM = require("next-transpile-modules")(["monaco-editor"]);
 
@@ -5,6 +6,7 @@ const withTM = require("next-transpile-modules")(["monaco-editor"]);
 const nextConfig = withTM({
   webpack: (config) => {
     config.plugins.push(new WindiCSSWebpackPlugin());
+
     return config;
   },
   compress: true,

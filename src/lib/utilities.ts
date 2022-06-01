@@ -1,6 +1,7 @@
+import localforage from "localforage";
 import { hostname } from "os";
 
-export function clsx(...str: string[]) {
+export function clsx(...str: (string | boolean)[]) {
   return str.filter(Boolean).join(" ");
 }
 
@@ -18,4 +19,27 @@ export function toGitRaw(url: string) {
 
   const result = new URL(`${user}/${repo}/${branch}/${filename}`, BASE).href;
   return result; //?
+}
+
+export const createFileSystem = (name: string) => {
+  const client = localforage.createInstance({ name });
+
+  return {
+    async getItem(key: string) {
+      const item = await client.getItem(key);
+      return item;
+    },
+    async setItem(key: string, data: unknown) {
+      await client.setItem(key, data);
+    },
+  };
+};
+
+export function normalizeThemeName(str: string) {
+  if (typeof str !== "string") return "";
+
+  return str
+    .toLowerCase()
+    .replace(/[^A-Za-z']/g, "")
+    .replace(/\s+/g, "-");
 }
