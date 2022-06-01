@@ -62,6 +62,8 @@ const Editor: React.FC = () => {
   useIsomorphicEffect(() => {
     const name = normalizeThemeName(currentTheme.value);
 
+    if (currentTheme.value === "vs-dark") return;
+    
     loadTheme(currentTheme).then((theme) => {
       if (!monacoInstance?.editor) return;
       monacoInstance!.editor.defineTheme(name, theme);
