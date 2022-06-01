@@ -70,7 +70,7 @@ export function createDndController(
   const createMouseDropWidget = () => {
     if (!state.node) {
       state.node = document.createElement("div");
-      state.node.className = "drop-target";
+      state.node.className = "drop-target  animate-skeleton";
       state.node.innerText = "DROP TO INSERT HERE";
     }
 

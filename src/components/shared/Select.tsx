@@ -1,7 +1,7 @@
 import { Listbox, Transition } from "@headlessui/react";
-import { SelectorIcon, CheckIcon } from "@heroicons/react/outline";
+import { CheckIcon, SelectorIcon } from "@heroicons/react/outline";
 import { clsx } from "@lib/utilities";
-import React, { FC, Fragment } from "react";
+import React, { Fragment } from "react";
 
 export type Selectable<T> = {
   label: string;

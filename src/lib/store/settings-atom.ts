@@ -1,7 +1,6 @@
 import { toGitRaw } from "@lib/utilities";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { toArray } from "lodash-es";
 import { isSSR } from "src/hooks/use-isomorphic-effect";
 
 const fetchThemes = async () => {

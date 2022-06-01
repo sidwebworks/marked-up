@@ -1001,5 +1001,5 @@
 }
 
 .monaco-editor .drop-target {
-    @apply text-center text-sm pointer-events-none w-[300px] text-green-400 border-2 border-dashed border-green-400
+    @apply text-center text-sm pointer-events-none animate-duration-[4s] w-[400px] mx-1 text-green-400 border-2 border-dashed border-green-400
 }

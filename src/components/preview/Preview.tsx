@@ -29,8 +29,6 @@ const Preview: React.FC = () => {
 
       const found = h2s.find((el) => sanitizeHash(el.innerHTML) === hash);
 
-      console.log(found);
-
       if (!found) return;
 
       found.scrollIntoView({

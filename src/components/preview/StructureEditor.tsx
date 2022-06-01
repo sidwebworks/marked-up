@@ -20,7 +20,7 @@ const StructureEditor: React.FC<StructureEditorProps> = () => {
           content={el.content}
         />
       ))}
-      <div className="inset-0 mx-2 pointer-events-none absolute p-2 border-2 border-dashed border-dark-200 " />
+      <div className="inset-0 mx-2 pointer-events-none absolute p-2 border-2 border-dashed border-dark-400 " />
     </div>
   );
 };

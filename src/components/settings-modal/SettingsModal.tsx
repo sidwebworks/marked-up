@@ -188,8 +188,10 @@ const SettingsTabs: React.FC = () => {
               onChange={() =>
                 setSettings((p) => ({
                   ...p,
-                  ...p.editor,
-                  scrollSync: !p.editor.scrollSync,
+                  editor: {
+                    ...p.editor,
+                    scrollSync: !p.editor.scrollSync,
+                  },
                 }))
               }
             />
