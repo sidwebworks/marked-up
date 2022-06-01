@@ -1,4 +1,3 @@
-const path = require("path");
 const WindiCSSWebpackPlugin = require("windicss-webpack-plugin");
 const withTM = require("next-transpile-modules")(["monaco-editor"]);
 
