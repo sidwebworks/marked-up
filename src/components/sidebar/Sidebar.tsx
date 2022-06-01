@@ -4,9 +4,11 @@ import {
   MenuIcon,
   PuzzleIcon,
 } from "@heroicons/react/outline";
+import { codeAtom } from "@lib/store/editor-atoms";
 import { isSettingsOpen } from "@lib/store/ui-atoms";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import React, { ComponentType, FC, Fragment } from "react";
+import { useDownload } from "src/hooks/use-download";
 import { SettingsModal } from "../settings-modal";
 
 interface SidebarProps {}
@@ -27,6 +29,10 @@ const SidebarButton: FC<{
 
 const Sidebar: React.FC<SidebarProps> = () => {
   const toggleSettings = useSetAtom(isSettingsOpen);
+  const code = useAtomValue(codeAtom);
+
+  const handleDownload = useDownload();
+  
 
   return (
     <Fragment>
@@ -35,7 +41,10 @@ const Sidebar: React.FC<SidebarProps> = () => {
         <div className="flex-col justify-center ">
           <SidebarButton icon={PuzzleIcon} />
           <SidebarButton onClick={() => toggleSettings(true)} icon={CogIcon} />
-          <SidebarButton icon={DownloadIcon} />
+          <SidebarButton
+            icon={DownloadIcon}
+            onClick={() => handleDownload("README.md", code)}
+          />
         </div>
       </aside>
       <SettingsModal />

@@ -37,13 +37,13 @@ function Select<T extends any>({ active, data, onChange }: SelectProps<T>) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-dark-400 py-1 text-base shadow-lg  focusable sm:text-sm">
+          <Listbox.Options className="absolute px-0 mt-1 max-h-60 w-full overflow-auto rounded-md bg-dark-400 py-1 text-base shadow-lg  focusable sm:text-sm">
             {data.map((item) => (
               <Listbox.Option
                 key={item.label}
                 className={({ active }) =>
                   clsx(
-                    "relative cursor-pointer select-none py-2 pl-10 pr-4 ",
+                    "relative cursor-pointer list-none select-none py-2 pl-10 pr-4 ",
                     active
                       ? "bg-dark-300 transition text-cyan-500"
                       : "text-true-gray-200"
