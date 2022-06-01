@@ -35,9 +35,13 @@ export const themeAtom = atom(() => {
   return fetchThemes();
 });
 
-export const settings = atomWithStorage("__APP_SETTINGS__", {
-  scrollSync: true,
-  currentTheme: { label: "vs-dark", value: "Vs Dark" },
+export const settings = atomWithStorage("APP_SETTINGS", {
+  editor: {
+    scrollSync: true,
+    wordWrap: true,
+    currentTheme: { value: "vs-dark", label: "Vs Dark" },
+    cursorStyle: { label: "Block", value: "block" },
+  },
 });
 
 

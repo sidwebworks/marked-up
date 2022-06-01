@@ -14,7 +14,10 @@ import { useMonacoActions } from "./use-monaco-actions";
 const Editor: React.FC = () => {
   const editorRef = useRef<Instance>();
   const options = useAtomValue(optionsAtom);
-  const { scrollSync, currentTheme } = useAtomValue(settings);
+  const {
+    editor: { scrollSync, currentTheme },
+  } = useAtomValue(settings);
+
   const [code, setCode] = useAtom(codeAtom);
   const { controller, handleCopy, handleFormat } = useMonacoActions(editorRef);
 
@@ -24,7 +27,8 @@ const Editor: React.FC = () => {
   useIsomorphicEffect(() => {
     const name = normalizeThemeName(currentTheme.value);
 
-    if (currentTheme.label === "vs-dark") return;
+    console.log(currentTheme);
+    if (currentTheme.value === "vs-dark") return;
 
     loadTheme(currentTheme).then((theme) => {
       if (!monacoInstance?.editor) return;

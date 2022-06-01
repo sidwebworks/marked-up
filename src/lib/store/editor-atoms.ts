@@ -4,23 +4,27 @@ import { atomWithStorage } from "jotai/utils";
 import type { editor } from "monaco-editor";
 import { settings } from "./settings-atom";
 
+export type EditorOptions = editor.IStandaloneEditorConstructionOptions;
+
 export const codeAtom = atomWithStorage("__ACTIVE_FILE__", "");
 
 export const optionsAtom = atom<editor.IStandaloneEditorConstructionOptions>(
+  // @ts-ignore
   (get) => {
+    const editor = get(settings).editor;
     return {
       scrollbar: { verticalScrollbarSize: 10 },
       minimap: { enabled: false },
       fontSize: 15,
       lineNumbers: "off",
-      cursorStyle: "block-outline",
+      cursorStyle: editor?.cursorStyle?.value || "block-outline",
       language: "markdown",
       guides: { bracketPairs: false, indentation: false },
-      wordWrap: "on",
+      wordWrap: editor?.wordWrap ? "on" : "off",
       cursorSmoothCaretAnimation: true,
       scrollBeyondLastLine: false,
       padding: { top: 20, bottom: 20 },
-      theme: normalizeThemeName(get(settings).currentTheme.label),
+      theme: normalizeThemeName(editor?.currentTheme.value),
     };
   }
 );

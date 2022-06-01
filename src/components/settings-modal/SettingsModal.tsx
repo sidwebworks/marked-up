@@ -1,12 +1,13 @@
 import { Dialog, Tab, Transition } from "@headlessui/react";
 import { CogIcon } from "@heroicons/react/outline";
+import { EditorOptions } from "@lib/store/editor-atoms";
 import { settings, themeAtom } from "@lib/store/settings-atom";
 import { isSettingsOpen } from "@lib/store/ui-atoms";
 import { clsx, normalizeThemeName } from "@lib/utilities";
-import { useMonaco } from "@monaco-editor/react";
-import { useAtom, useAtomValue } from "jotai";
+import { Monaco, useMonaco } from "@monaco-editor/react";
+import { atom, useAtom, useAtomValue } from "jotai";
 import React, { Fragment, Suspense, useMemo } from "react";
-import { loadTheme } from "../editor/monaco.helpers";
+import { Instance, loadTheme } from "../editor/monaco.helpers";
 import Select from "../shared/Select";
 import Toggle from "../shared/Toggle";
 
@@ -86,7 +87,8 @@ const SettingsToggle: React.FC<SettingsOptionProps> = ({
 
 const ThemePicker: React.FC = () => {
   const themes = useAtomValue(themeAtom);
-  const [{ currentTheme }, setSelected] = useAtom(settings);
+  const [{ editor }, setSelected] = useAtom(settings);
+
   const monacoInstance = useMonaco();
 
   const handleChange = async (val: { label: string; value: string }) => {
@@ -99,18 +101,47 @@ const ThemePicker: React.FC = () => {
     monacoInstance.editor.defineTheme(name, theme);
     monacoInstance.editor.setTheme(name);
 
-    setSelected((p) => ({ ...p, currentTheme: val }));
+    setSelected((p) => ({ ...p, editor: { ...p.editor, currentTheme: val } }));
   };
 
-  return <Select data={themes} onChange={handleChange} active={currentTheme} />;
+  return (
+    <Select
+      data={themes}
+      onChange={handleChange}
+      active={editor.currentTheme}
+    />
+  );
 };
 
-interface SettingsTabsProps {}
+const CursorPicker: React.FC = () => {
+  const cursors = [
+    { label: "Blink", value: "block" },
+    { label: "Block outline", value: "block-outline" },
+    { label: "Line", value: "line" },
+    { label: "Line thin", value: "line-thin" },
+    { label: "Underline", value: "underline" },
+    { label: "Underline thin", value: "underline-thin" },
+  ];
 
-const SettingsTabs: React.FC<SettingsTabsProps> = () => {
+  const [{ editor }, setSettings] = useAtom(settings);
+
+  const handleChange = async (val: { label: string; value: string }) => {
+    setSettings((p) => ({ ...p, editor: { ...p.editor, cursorStyle: val } }));
+  };
+
+  return (
+    <Select
+      data={cursors}
+      onChange={handleChange}
+      active={editor.cursorStyle}
+    />
+  );
+};
+
+const SettingsTabs: React.FC = () => {
   const headers = useMemo(() => ["Editor", "Document", "Support"], []);
 
-  const [{ scrollSync }, setSettings] = useAtom(settings);
+  const [{ editor }, setSettings] = useAtom(settings);
 
   return (
     <Tab.Group defaultIndex={0}>
@@ -139,12 +170,26 @@ const SettingsTabs: React.FC<SettingsTabsProps> = () => {
             }
           >
             <SettingsToggle
-              value={scrollSync}
+              value={editor.wordWrap}
+              label="Enable Word wrap "
+              onChange={() =>
+                setSettings((p) => ({
+                  ...p,
+                  editor: {
+                    ...p.editor,
+                    wordWrap: !p.editor.wordWrap,
+                  },
+                }))
+              }
+            />
+            <SettingsToggle
+              value={editor.scrollSync}
               label="Enable scroll sync"
               onChange={() =>
                 setSettings((p) => ({
                   ...p,
-                  scrollSync: !p.scrollSync,
+                  ...p.editor,
+                  scrollSync: !p.editor.scrollSync,
                 }))
               }
             />
@@ -153,6 +198,12 @@ const SettingsTabs: React.FC<SettingsTabsProps> = () => {
                 {"Editor Theme"}
               </label>
               <ThemePicker />
+            </div>
+            <div className="py-1 border-y-1  col-span-2 flex items-center gap-2 border-dark-600">
+              <label className="text-true-gray-400  text-sm">
+                {"Editor Cursor"}
+              </label>
+              <CursorPicker />
             </div>
           </Suspense>
         </Tab.Panel>
