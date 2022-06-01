@@ -37,7 +37,7 @@ export const themeAtom = atom(() => {
 
 export const settings = atomWithStorage("__APP_SETTINGS__", {
   scrollSync: true,
-  currentTheme: { label: "vs-dark", value: "Default Dark" },
+  currentTheme: { label: "vs-dark", value: "Vs Dark" },
 });
 
 

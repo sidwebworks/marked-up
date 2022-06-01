@@ -38,6 +38,8 @@ export const createFileSystem = (name: string) => {
 export function normalizeThemeName(str: string) {
   if (typeof str !== "string") return "";
 
+  if (str === "vs-dark") return str;
+
   return str
     .toLowerCase()
     .replace(/[^A-Za-z']/g, "")

@@ -40,6 +40,8 @@ const Editor: React.FC = () => {
   const preview = useDomElement("#preview");
   const monacoInstance = useMonaco();
 
+  console.log(options.theme);
+
   const handleDrop = (e: DragEvent<HTMLDivElement>, target: any) => {
     e.preventDefault();
 
@@ -62,8 +64,8 @@ const Editor: React.FC = () => {
   useIsomorphicEffect(() => {
     const name = normalizeThemeName(currentTheme.value);
 
-    if (currentTheme.value === "vs-dark") return;
-    
+    if (currentTheme.label === "vs-dark") return;
+
     loadTheme(currentTheme).then((theme) => {
       if (!monacoInstance?.editor) return;
       monacoInstance!.editor.defineTheme(name, theme);
@@ -157,6 +159,7 @@ const Editor: React.FC = () => {
         language={"markdown"}
         value={code}
         loading=""
+        theme={options.theme}
         options={options}
         height={"100%"}
       />
