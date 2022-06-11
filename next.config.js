@@ -9,7 +9,7 @@ const nextConfig = withTM({
     return config;
   },
   compress: true,
-  reactStrictMode: false,
+  reactStrictMode: true,
 });
 
 module.exports = nextConfig;
