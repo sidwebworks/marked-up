@@ -1,5 +1,5 @@
 import { createFileSystem, toGitRaw } from "@lib/utilities";
-import { editor } from "monaco-editor";
+import type { editor } from "monaco-editor";
 import { DragEvent, MutableRefObject } from "react";
 import { Selectable } from "../shared/Select";
 

@@ -1,33 +1,45 @@
 import { codeAtom } from "@lib/store/editor-atoms";
+import { useMonaco } from "@monaco-editor/react";
 import { useSetAtom } from "jotai";
-import { Range, Selection } from "monaco-editor/esm/vs/editor/editor.api";
 import { DragEvent, useRef } from "react";
 import toast from "react-hot-toast";
 import { createDndController, Instance, TInstanceRef } from "./monaco.helpers";
 
-const insertTextAtPos = (
-  instance: Instance,
-  text: string,
-  coords: [number, number] = [0, 0],
-  placeCursor: boolean = false
-) => {
-  const range = new Range(coords[0], coords[1], coords[0], coords[1]);
-  if (placeCursor) {
-    const selection = new Selection(coords[0], coords[1], coords[0], coords[1]);
-    instance.executeEdits(
-      "insert",
-      [{ range, text, forceMoveMarkers: true }],
-      [selection]
-    );
-    instance.focus();
-  } else {
-    instance.executeEdits("insert", [{ range, text, forceMoveMarkers: true }]);
-  }
-  instance.pushUndoStop();
-};
-
 export const useMonacoActions = (instance: TInstanceRef) => {
   const setCode = useSetAtom(codeAtom);
+  const monaco = useMonaco();
+
+  const insertTextAtPos = (
+    instance: Instance,
+    text: string,
+    coords: [number, number] = [0, 0],
+    placeCursor: boolean = false
+  ) => {
+    if (!monaco) return;
+
+    const range = new monaco.Range(coords[0], coords[1], coords[0], coords[1]);
+
+    if (placeCursor) {
+      const selection = new monaco.Selection(
+        coords[0],
+        coords[1],
+        coords[0],
+        coords[1]
+      );
+
+      instance.executeEdits(
+        "insert",
+        [{ range, text, forceMoveMarkers: true }],
+        [selection]
+      );
+      instance.focus();
+    } else {
+      instance.executeEdits("insert", [
+        { range, text, forceMoveMarkers: true },
+      ]);
+    }
+    instance.pushUndoStop();
+  };
 
   const handleDrop = (e: DragEvent<HTMLDivElement>, target: any) => {
     e.preventDefault();
