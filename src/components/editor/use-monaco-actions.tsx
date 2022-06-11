@@ -1,13 +1,13 @@
 import { codeAtom } from "@lib/store/editor-atoms";
-import { useMonaco } from "@monaco-editor/react";
 import { useSetAtom } from "jotai";
-import { DragEvent, useRef } from "react";
+import { DragEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useEditor } from "src/hooks/use-editor";
 import { createDndController, Instance, TInstanceRef } from "./monaco.helpers";
 
 export const useMonacoActions = (instance: TInstanceRef) => {
   const setCode = useSetAtom(codeAtom);
-  const monaco = useMonaco();
+  const { monaco, editor } = useEditor();
 
   const insertTextAtPos = (
     instance: Instance,
@@ -45,7 +45,6 @@ export const useMonacoActions = (instance: TInstanceRef) => {
     e.preventDefault();
 
     const text = e.dataTransfer.getData("text");
-    const editor = instance.current;
 
     if (!text.trim() || !editor) return;
 
@@ -58,6 +57,7 @@ export const useMonacoActions = (instance: TInstanceRef) => {
 
   const handleFormat = async () => {
     const md = instance.current?.getValue() || "";
+
     if (!md.trim()) return;
 
     const [prettier, parser] = await Promise.all([
@@ -90,7 +90,13 @@ export const useMonacoActions = (instance: TInstanceRef) => {
     }
   };
 
-  const controller = useRef(createDndController(instance, handleDrop));
+  const [controller, setController] = useState(() =>
+    createDndController(instance, handleDrop)
+  );
+
+  useEffect(() => {
+    setController(createDndController(instance, handleDrop));
+  }, [monaco, editor]);
 
   return {
     controller,

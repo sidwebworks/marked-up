@@ -2,10 +2,10 @@ import { BeakerIcon, ClipboardCopyIcon } from "@heroicons/react/outline";
 import { codeAtom, optionsAtom } from "@lib/store/editor-atoms";
 import { settings } from "@lib/store/settings-atom";
 import { normalizeThemeName } from "@lib/utilities";
-import MonacoEditor, { OnMount, useMonaco } from "@monaco-editor/react";
+import MonacoEditor, { OnMount } from "@monaco-editor/react";
 import { useAtom, useAtomValue } from "jotai";
 import React, { Fragment, useRef } from "react";
-import { useDownload } from "src/hooks/use-download";
+import { useEditor } from "src/hooks/use-editor";
 import { useDomElement } from "../../hooks/use-dom-element";
 import { useIsomorphicEffect } from "../../hooks/use-isomorphic-effect";
 import { Instance, loadTheme } from "./monaco.helpers";
@@ -19,23 +19,23 @@ const Editor: React.FC = () => {
   } = useAtomValue(settings);
 
   const [code, setCode] = useAtom(codeAtom);
-  const { controller, handleCopy, handleFormat } = useMonacoActions(editorRef);
 
   const preview = useDomElement("#preview");
-  const monacoInstance = useMonaco();
+  const { monaco, update, editor } = useEditor();
+
+  const { controller, handleCopy, handleFormat } = useMonacoActions(editorRef);
 
   useIsomorphicEffect(() => {
     const name = normalizeThemeName(currentTheme.value);
 
-    console.log(currentTheme);
     if (currentTheme.value === "vs-dark") return;
 
     loadTheme(currentTheme).then((theme) => {
-      if (!monacoInstance?.editor) return;
-      monacoInstance!.editor.defineTheme(name, theme);
-      monacoInstance!.editor.setTheme(name);
+      if (!monaco?.editor) return;
+      monaco!.editor.defineTheme(name, theme);
+      monaco!.editor.setTheme(name);
     });
-  }, [monacoInstance, currentTheme]);
+  }, [monaco, currentTheme]);
 
   //TODO: Refactor this to a custom hook?
   useIsomorphicEffect(() => {
@@ -58,11 +58,12 @@ const Editor: React.FC = () => {
     return () => {
       disposables.forEach((d) => d?.dispose());
     };
-  }, [preview, editorRef.current, scrollSync]);
+  }, [preview, editor, scrollSync]);
 
-  const onEditorDidMount: OnMount = (editor) => {
+  const onEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     editor.onDidChangeModelContent(() => setCode(editor.getValue()));
+    update((p) => ({ ...p, editor, monaco }));
   };
 
   return (
@@ -85,7 +86,7 @@ const Editor: React.FC = () => {
       </header>
       <MonacoEditor
         onMount={onEditorDidMount}
-        wrapperProps={controller.current.getContainerProps()}
+        wrapperProps={controller.getContainerProps()}
         language={"markdown"}
         value={code}
         loading=""
